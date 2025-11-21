@@ -1,0 +1,62 @@
+Here’s a complete, optimized Replit AI prompt you can use to make the app you described. It clearly defines both functional and design requirements so Replit AI can generate a working prototype accurately.  
+
+***
+
+**Prompt for Replit AI:**
+
+```
+Build a full-stack web app for **Anurag University Sports Complex Availability Tracker**.
+
+### App Purpose:
+The app tracks real-time availability of all sports courts and allows users to check in and check out based on availability. It should ensure that each check-in lasts a maximum of 1 hour unless the user checks out earlier.
+
+### Features & Functionality:
+1. Display all available sports courts with real-time status:
+   - 2 Badminton courts
+   - 2 Volleyball courts
+   - 5 Carrom boards
+   - 2 Basketball courts
+   - 1 Football field
+   - 1 Tennis court
+
+2. Each court/board should show whether it is:
+   - Available (green indicator)
+   - Occupied (red indicator)
+
+3. When an available court is clicked, the user can “Check In.”  
+   - Once checked in, that court should immediately change to “Busy.”
+   - Automatically start a 1-hour timer for that user.  
+   - After 1 hour, show a notification reminding the user to check out.
+
+4. If the user checks out before 1 hour, the slot immediately becomes “Available” again.
+
+5. All availability changes should instantly reflect across the app (use real-time sync using Firebase or any lightweight backend).
+
+6. Display total counts of available vs total courts for each sport.
+
+### UI Design:
+- Follow Anurag University’s branding:
+  - Dominant colors: White background
+  - Secondary colors: Vibrant Red (#E50914) and Blue (#0033A0)
+- Use a clean, modern layout with responsive design.
+- Include buttons or tabs to switch between sports categories.
+- Each court should appear as a card showing:
+  - Sport name
+  - Court number
+  - Status (Available/Busy)
+  - Check-In or Check-Out button depending on status.
+- Add a small notification section or popup for automatic reminders.
+
+### Tech Stack Recommendation:
+- Frontend: React.js (with Tailwind CSS using the given color scheme)
+- Backend: Node.js + Express
+- Database / Real-time sync: Firebase Realtime Database or Firestore
+- Hosting: Replit server environment
+
+### Goal:
+Generate fully functional code with all frontend, backend, and database components connected. The app should be ready to run directly on Replit with live update functionality.
+```
+
+***
+
+Would you like this prompt to focus on a **web interface**, or should it instead generate a **mobile app (React Native or Flutter)** version?
