@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useTheme } from "next-themes";
 import { useQuery } from "@tanstack/react-query";
 import {
   Clock,
@@ -32,14 +31,7 @@ import {
 import type { User } from "@shared/schema";
 
 export function ProfileDropdown() {
-  const { theme, setTheme } = useTheme();
   const [openDialog, setOpenDialog] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  // Hydrate theme
-  if (!mounted) {
-    setTimeout(() => setMounted(true), 0);
-  }
 
   const { data: user } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -51,8 +43,31 @@ export function ProfileDropdown() {
   };
 
   const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
+    const root = document.documentElement;
+    if (newTheme === "dark") {
+      root.classList.add("dark");
+    } else if (newTheme === "light") {
+      root.classList.remove("dark");
+    } else {
+      // system
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (prefersDark) {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+    }
+    localStorage.setItem("theme", newTheme);
   };
+
+  const getTheme = () => {
+    const saved = localStorage.getItem("theme");
+    if (saved) return saved;
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return prefersDark ? "dark" : "light";
+  };
+
+  const currentTheme = getTheme();
 
   return (
     <>
@@ -89,21 +104,21 @@ export function ProfileDropdown() {
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               <DropdownMenuCheckboxItem
-                checked={theme === "light"}
+                checked={currentTheme === "light"}
                 onCheckedChange={() => handleThemeChange("light")}
                 data-testid="theme-light"
               >
                 Light
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={theme === "dark"}
+                checked={currentTheme === "dark"}
                 onCheckedChange={() => handleThemeChange("dark")}
                 data-testid="theme-dark"
               >
                 Dark
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
-                checked={theme === "system"}
+                checked={currentTheme === "system"}
                 onCheckedChange={() => handleThemeChange("system")}
                 data-testid="theme-system"
               >
