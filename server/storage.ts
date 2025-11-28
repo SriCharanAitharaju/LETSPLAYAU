@@ -7,6 +7,7 @@ export interface IStorage {
   // User methods (REQUIRED for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  getAllUsers(): Promise<User[]>;
   
   // Court methods
   getAllCourts(): Promise<Court[]>;
@@ -60,6 +61,10 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
   }
 
   // Court methods
