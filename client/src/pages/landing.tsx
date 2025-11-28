@@ -9,31 +9,41 @@ export default function Landing() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const validateEmail = (emailValue: string) => {
+    if (!emailValue.trim()) {
+      return "Email is required";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValue)) {
+      return "Please enter a valid email address";
+    }
+
+    if (!emailValue.endsWith("@anurag.edu.in")) {
+      return "Please use your Anurag University email (format: yourname@anurag.edu.in)";
+    }
+
+    return "";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const validationError = validateEmail(email);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setError("");
-
-    // Validate email format
-    if (!email) {
-      setError("Email is required");
-      return;
-    }
-
-    if (!email.includes("@")) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    if (!email.endsWith("@anurag.edu.in")) {
-      setError("Please use your college email (e.g., 24eg104a28@anurag.edu.in)");
-      return;
-    }
-
     setIsLoading(true);
-    // Store email in session storage temporarily if needed
     sessionStorage.setItem("userEmail", email);
-    // Redirect to Replit login
     window.location.href = "/api/login";
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setError("");
   };
 
   return (
@@ -41,35 +51,43 @@ export default function Landing() {
       <Card className="w-full max-w-md p-8 shadow-lg">
         <div className="space-y-6">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
               Sports Court Booking
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-300 mt-2">
+            <p className="text-slate-600 dark:text-slate-300 mt-3">
               Book your favorite sports court in seconds
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">College Email</Label>
+              <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
+                Anurag University Email
+              </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="24eg104a28@anurag.edu.in"
+                placeholder="example@anurag.edu.in"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError("");
-                }}
+                onChange={handleEmailChange}
                 disabled={isLoading}
                 data-testid="input-email"
+                className="border-slate-300 dark:border-slate-600"
               />
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Format: yourname@anurag.edu.in
+              </p>
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 dark:text-red-400" data-testid="text-error">
-                {error}
-              </p>
+              <div 
+                className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
+                data-testid="text-error"
+              >
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {error}
+                </p>
+              </div>
             )}
 
             <Button
@@ -83,9 +101,9 @@ export default function Landing() {
             </Button>
           </form>
 
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-            <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-              Use your college email to sign in
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700 text-center">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Sign in with your university email to access the court booking system
             </p>
           </div>
         </div>
