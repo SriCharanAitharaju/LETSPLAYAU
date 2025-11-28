@@ -350,8 +350,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           authMethod: "password",
         });
 
-        // Create session
-        (req as any).user = {
+        // Create session by setting user on request
+        const user = {
           claims: {
             sub: newUser.id,
             email: newUser.email,
@@ -359,13 +359,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         };
         
-        (req as any).login((req as any).user, (err: any) => {
-          if (err) {
-            return res.status(500).json({ message: "Session creation failed" });
-          }
-          res.json({ success: true, user: newUser });
+        return new Promise((resolve) => {
+          (req as any).login(user, (err: any) => {
+            if (err) {
+              console.error("Login error:", err);
+              return res.status(500).json({ message: "Session creation failed" });
+            }
+            res.json({ success: true, user: newUser });
+            resolve(null);
+          });
         });
-        return;
       }
 
       // Check if user was created with password auth
@@ -384,8 +387,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create session
-      (req as any).user = {
+      // Create session by setting user on request
+      const user = {
         claims: {
           sub: existingUser.id,
           email: existingUser.email,
@@ -393,11 +396,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       };
       
-      (req as any).login((req as any).user, (err: any) => {
-        if (err) {
-          return res.status(500).json({ message: "Session creation failed" });
-        }
-        res.json({ success: true, user: existingUser });
+      return new Promise((resolve) => {
+        (req as any).login(user, (err: any) => {
+          if (err) {
+            console.error("Login error:", err);
+            return res.status(500).json({ message: "Session creation failed" });
+          }
+          res.json({ success: true, user: existingUser });
+          resolve(null);
+        });
       });
     } catch (error) {
       console.error("Password login error:", error);
