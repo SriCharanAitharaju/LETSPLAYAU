@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import type { WSMessage, Court } from "@shared/schema";
+import bcryptjs from "bcryptjs";
 
 // Store active sessions with their timeout IDs and warning timers
 const sessionTimers = new Map<string, NodeJS.Timeout>();
@@ -311,6 +312,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching active sessions:", error);
       res.status(500).json({ error: "Failed to fetch active sessions" });
+    }
+  });
+
+  // Password-based login endpoint
+  app.post("/api/auth/password-login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // Validate email format
+      if (!email || !email.endsWith("@anurag.edu.in")) {
+        return res.status(400).json({ 
+          message: "Please use your Anurag University email (@anurag.edu.in)" 
+        });
+      }
+
+      // Validate password
+      if (!password || password.length < 6) {
+        return res.status(400).json({ 
+          message: "Password must be at least 6 characters" 
+        });
+      }
+
+      // Try to find existing user
+      const existingUser = await storage.getUserByEmail(email);
+
+      if (!existingUser) {
+        // Create new user with password
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        const firstName = email.split("@")[0];
+        
+        const newUser = await storage.upsertUser({
+          id: undefined, // Let DB generate ID
+          email,
+          firstName,
+          passwordHash: hashedPassword,
+          authMethod: "password",
+        });
+
+        // Create session
+        (req as any).user = {
+          claims: {
+            sub: newUser.id,
+            email: newUser.email,
+            first_name: newUser.firstName,
+          },
+        };
+        
+        (req as any).login((req as any).user, (err: any) => {
+          if (err) {
+            return res.status(500).json({ message: "Session creation failed" });
+          }
+          res.json({ success: true, user: newUser });
+        });
+        return;
+      }
+
+      // Check if user was created with password auth
+      if (existingUser.authMethod !== "password" || !existingUser.passwordHash) {
+        return res.status(400).json({ 
+          message: "This account uses Google sign-in. Please use 'Sign in with Google' instead." 
+        });
+      }
+
+      // Verify password
+      const isPasswordValid = await bcryptjs.compare(password, existingUser.passwordHash);
+      
+      if (!isPasswordValid) {
+        return res.status(401).json({ 
+          message: "Invalid email or password" 
+        });
+      }
+
+      // Create session
+      (req as any).user = {
+        claims: {
+          sub: existingUser.id,
+          email: existingUser.email,
+          first_name: existingUser.firstName,
+        },
+      };
+      
+      (req as any).login((req as any).user, (err: any) => {
+        if (err) {
+          return res.status(500).json({ message: "Session creation failed" });
+        }
+        res.json({ success: true, user: existingUser });
+      });
+    } catch (error) {
+      console.error("Password login error:", error);
+      res.status(500).json({ message: "Login failed" });
     }
   });
 
