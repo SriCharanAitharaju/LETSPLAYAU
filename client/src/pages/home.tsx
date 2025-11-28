@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Dashboard from "./dashboard";
+import WelcomeSplash from "./welcome-splash";
 import { LogOut } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
+  const [showDashboard, setShowDashboard] = useState(false);
 
   if (isLoading) {
     return (
@@ -17,6 +20,15 @@ export default function Home() {
   }
 
   const studentName = user?.firstName || user?.email?.split("@")[0] || "Student";
+
+  if (!showDashboard) {
+    return (
+      <WelcomeSplash
+        studentName={studentName}
+        onComplete={() => setShowDashboard(true)}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6 p-4">
