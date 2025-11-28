@@ -1,0 +1,35 @@
+Here is a perfect prompt you can give to Replit AI to add a Profile option in the dashboard with creative and user-friendly buttons:
+
+***
+Add a Profile section in the student dashboard with the following features:
+
+1. Profile menu accessible from the dashboard sidebar or top-right corner click.
+2. Under Profile, include clear, attractive buttons:
+   - History: Show past activities/login history
+   - Theme: Allow switching between light/dark mode and color themes
+   - Settings: Manage password, notification preferences
+   - Help/Support: Quick access to FAQs or contact support
+   - Logout button
+3. Use intuitive icons on buttons for quick recognition (e.g., clock for History, palette for Theme).
+4. Keep layout clean and mobile-friendly for easy navigation.
+5. Use Anurag University colors (red, blue, white) and highlight hovered buttons for interactivity.
+6. Add smooth transitions or subtle animations on button clicks for a modern feel.
+
+Make this Profile dropdown or sidebar expandable/collapsible so the user can focus on main dashboard content easily. The design should be inviting, simple, and elegant for students.
+
+This creates an engaging personalized experience with all key personal options at one place.
+
+***
+
+This matches modern dashboard UI/UX best practices and common student portal designs. Would you like sample code or design mockups next?[2][4][5]
+
+[1](https://www.boldbi.com/resources/dashboard-examples/education/student-performance-dashboard/)
+[2](https://www.justinmind.com/ui-design/dashboard-design-best-practices-ux)
+[3](https://www.behance.net/search/projects/Student%20Profile%20ui%20design?locale=en_US)
+[4](https://muz.li/inspiration/profile-page/)
+[5](https://www.behance.net/search/projects/student%20dashboard%20)
+[6](https://github.com/topics/student-dashboard)
+[7](https://dribbble.com/tags/student-dashboard)
+[8](https://www.figma.com/templates/dashboard-designs/)
+[9](https://dribbble.com/search/student-dashboard)
+[10](https://www.notion.com/templates/category/student-dashboards)

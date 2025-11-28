@@ -1,10 +1,9 @@
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Dashboard from "./dashboard";
 import WelcomeSplash from "./welcome-splash";
-import { LogOut } from "lucide-react";
+import { ProfileDropdown } from "@/components/profile-dropdown";
 import { useState } from "react";
 
 export default function Home() {
@@ -42,16 +41,7 @@ export default function Home() {
               {user?.email}
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.location.href = "/api/logout"}
-            data-testid="button-logout"
-            className="gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
+          <ProfileDropdown />
         </div>
       </Card>
 
