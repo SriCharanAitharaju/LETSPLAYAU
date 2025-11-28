@@ -134,10 +134,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's active session
+  app.get("/api/user-session", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const session = await storage.getUserActiveSession(userId);
+      res.json({ session });
+    } catch (error) {
+      console.error("Error fetching user session:", error);
+      res.status(500).json({ error: "Failed to fetch user session" });
+    }
+  });
+
   // Check in to a court
-  app.post("/api/check-in", async (req, res) => {
+  app.post("/api/check-in", isAuthenticated, async (req: any, res) => {
     try {
       const { courtId } = req.body;
+      const userId = req.user.claims.sub;
+      const userEmail = req.user.claims.email || "unknown@anurag.edu.in";
 
       if (!courtId) {
         return res.status(400).json({ error: "Court ID is required" });
@@ -150,11 +164,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (court.status === "occupied") {
-        return res.status(400).json({ error: "Court is already occupied" });
+        return res.status(400).json({ error: "Court is already occupied by another user" });
+      }
+
+      // Check if user already has an active session on another court
+      const userActiveSession = await storage.getUserActiveSession(userId);
+      if (userActiveSession) {
+        const activeCourtId = userActiveSession.courtId;
+        const activeCourt = await storage.getCourt(activeCourtId);
+        return res.status(409).json({ 
+          error: `You are already using ${activeCourt?.name}. Please check out from that court first.`,
+          activeCourtId,
+          activeCourtName: activeCourt?.name,
+        });
       }
 
       // Create a new session
-      const session = await storage.createSession(courtId);
+      const session = await storage.createSession(courtId, userId, userEmail);
       
       // Update court status
       const updatedCourt = await storage.updateCourtStatus(courtId, "occupied", session);
@@ -186,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Check out from a court
-  app.post("/api/check-out", async (req, res) => {
+  app.post("/api/check-out", isAuthenticated, async (req: any, res) => {
     try {
       const { courtId } = req.body;
 

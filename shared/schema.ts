@@ -39,10 +39,12 @@ export interface Court {
   currentSession?: Session;
 }
 
-// Active session
+// Active session - now includes userId to track which user is using the court
 export interface Session {
   id: string;
   courtId: string;
+  userId?: string;
+  userEmail?: string;
   startTime: number; // Unix timestamp
   endTime: number; // Unix timestamp (startTime + 1 hour)
 }

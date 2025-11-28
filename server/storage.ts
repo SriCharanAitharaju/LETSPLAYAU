@@ -14,10 +14,11 @@ export interface IStorage {
   updateCourtStatus(courtId: string, status: "available" | "occupied", session?: Session): Promise<Court | undefined>;
   
   // Session methods
-  createSession(courtId: string): Promise<Session>;
+  createSession(courtId: string, userId: string, userEmail: string): Promise<Session>;
   getSession(sessionId: string): Promise<Session | undefined>;
   endSession(sessionId: string): Promise<void>;
   getActiveSession(courtId: string): Promise<Session | undefined>;
+  getUserActiveSession(userId: string): Promise<Session | undefined>;
   getAllActiveSessions(): Promise<Session[]>;
 }
 
@@ -86,7 +87,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Session methods
-  async createSession(courtId: string): Promise<Session> {
+  async createSession(courtId: string, userId: string, userEmail: string): Promise<Session> {
     const id = randomUUID();
     const startTime = Date.now();
     const endTime = startTime + 3600000; // 1 hour (3600000 ms)
@@ -94,6 +95,8 @@ export class DatabaseStorage implements IStorage {
     const session: Session = {
       id,
       courtId,
+      userId,
+      userEmail,
       startTime,
       endTime,
     };
@@ -113,6 +116,12 @@ export class DatabaseStorage implements IStorage {
   async getActiveSession(courtId: string): Promise<Session | undefined> {
     return Array.from(this.sessions.values()).find(
       (session) => session.courtId === courtId,
+    );
+  }
+
+  async getUserActiveSession(userId: string): Promise<Session | undefined> {
+    return Array.from(this.sessions.values()).find(
+      (session) => session.userId === userId,
     );
   }
 

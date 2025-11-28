@@ -8,7 +8,7 @@ import { CourtCard } from "@/components/court-card";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardSummary } from "@/components/dashboard-summary";
 import { useToast } from "@/hooks/use-toast";
-import type { Court, SportType } from "@shared/schema";
+import type { Court, SportType, Session } from "@shared/schema";
 import { SPORT_METADATA } from "@shared/schema";
 import { 
   Activity, 
@@ -37,6 +37,13 @@ export default function Dashboard() {
   const { data: initialCourts, isLoading } = useQuery<Court[]>({
     queryKey: ["/api/courts"],
   });
+
+  // Fetch user's active session
+  const { data: userSessionData } = useQuery<{ session?: Session }>({
+    queryKey: ["/api/user-session"],
+  });
+
+  const userActiveSession = userSessionData?.session;
 
   // Set up WebSocket connection
   useEffect(() => {
@@ -240,7 +247,12 @@ export default function Dashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {sportCourts.map(court => (
-                    <CourtCard key={court.id} court={court} ws={ws} />
+                    <CourtCard 
+                      key={court.id} 
+                      court={court} 
+                      ws={ws}
+                      userActiveSession={userActiveSession}
+                    />
                   ))}
                 </div>
               </section>

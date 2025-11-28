@@ -6,15 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { CheckCircle, Clock, LogIn, LogOut } from "lucide-react";
-import type { Court } from "@shared/schema";
+import { CheckCircle, Clock, LogIn, LogOut, AlertCircle } from "lucide-react";
+import type { Court, Session } from "@shared/schema";
 
 interface CourtCardProps {
   court: Court;
   ws: WebSocket | null;
+  userActiveSession?: Session;
 }
 
-export function CourtCard({ court, ws }: CourtCardProps) {
+export function CourtCard({ court, ws, userActiveSession }: CourtCardProps) {
   const { toast } = useToast();
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [progress, setProgress] = useState<number>(100);
@@ -46,6 +47,7 @@ export function CourtCard({ court, ws }: CourtCardProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/courts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user-session"] });
       toast({
         title: "Checked In Successfully",
         description: `You have checked into ${court.name}. Enjoy your session!`,
@@ -66,6 +68,7 @@ export function CourtCard({ court, ws }: CourtCardProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/courts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user-session"] });
       toast({
         title: "Checked Out Successfully",
         description: `Thank you for using ${court.name}!`,
@@ -88,6 +91,8 @@ export function CourtCard({ court, ws }: CourtCardProps) {
 
   const isAvailable = court.status === "available";
   const isProcessing = checkInMutation.isPending || checkOutMutation.isPending;
+  const isUserUsingAnotherCourt = userActiveSession && userActiveSession.courtId !== court.id;
+  const isCheckInDisabled = isUserUsingAnotherCourt;
 
   return (
     <Card 
@@ -146,7 +151,19 @@ export function CourtCard({ court, ws }: CourtCardProps) {
           </div>
         )}
 
-        {isAvailable && (
+        {isAvailable && isCheckInDisabled && (
+          <div className="text-center py-6 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+            <AlertCircle className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto mb-2" />
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+              You're already using another court
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+              Please check out first to use this court
+            </p>
+          </div>
+        )}
+
+        {isAvailable && !isCheckInDisabled && (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-3" data-testid={`icon-available-${court.id}`}>
               <CheckCircle className="w-8 h-8 text-green-500" />
@@ -162,7 +179,7 @@ export function CourtCard({ court, ws }: CourtCardProps) {
         {isAvailable ? (
           <Button
             onClick={() => checkInMutation.mutate()}
-            disabled={isProcessing}
+            disabled={isProcessing || isCheckInDisabled}
             className="w-full"
             size="lg"
             data-testid={`button-checkin-${court.id}`}
