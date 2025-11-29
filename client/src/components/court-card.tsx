@@ -86,7 +86,11 @@ export function CourtCard({ court, ws, userActiveSession }: CourtCardProps) {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    // Show minutes format for clarity
+    if (secs === 0) {
+      return `${mins} MIN`;
+    }
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const isAvailable = court.status === "available";
@@ -140,7 +144,7 @@ export function CourtCard({ court, ws, userActiveSession }: CourtCardProps) {
           <div className="space-y-4">
             <div className="text-center py-4">
               <p className="text-sm text-muted-foreground mb-2" data-testid={`text-timer-label-${court.id}`}>Time Remaining</p>
-              <p className="text-4xl font-mono font-bold text-foreground" data-testid={`text-timer-${court.id}`}>
+              <p className="text-4xl font-bold text-foreground" data-testid={`text-timer-${court.id}`}>
                 {formatTime(timeRemaining)}
               </p>
               <p className="text-xs text-muted-foreground mt-2" data-testid={`text-auto-checkout-${court.id}`}>
