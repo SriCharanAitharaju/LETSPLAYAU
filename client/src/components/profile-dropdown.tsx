@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -72,14 +73,16 @@ export function ProfileDropdown() {
   return (
     <>
       <DropdownMenu>
-        <Button
-          variant="ghost"
-          size="icon"
-          data-testid="button-profile-menu"
-          className="hover-elevate"
-        >
-          <UserIcon className="w-5 h-5" />
-        </Button>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            data-testid="button-profile-menu"
+            className="hover-elevate"
+          >
+            <UserIcon className="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel className="font-semibold">
             {user?.firstName || "Profile"}
