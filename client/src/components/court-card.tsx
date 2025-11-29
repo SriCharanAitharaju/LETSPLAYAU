@@ -26,9 +26,11 @@ export function CourtCard({ court, ws, userActiveSession }: CourtCardProps) {
       const updateTimer = () => {
         const now = Date.now();
         const remaining = Math.max(0, court.currentSession!.endTime - now);
-        const progressPercent = (remaining / 3600000) * 100;
+        // Cap at 1 hour (3600000 ms) to ensure timer never shows more than 60 minutes
+        const cappedRemaining = Math.min(remaining, 3600000);
+        const progressPercent = (cappedRemaining / 3600000) * 100;
         
-        setTimeRemaining(Math.floor(remaining / 1000));
+        setTimeRemaining(Math.floor(cappedRemaining / 1000));
         setProgress(progressPercent);
       };
 

@@ -22,6 +22,7 @@ export interface IStorage {
   getActiveSession(courtId: string): Promise<Session | undefined>;
   getUserActiveSession(userId: string): Promise<Session | undefined>;
   getAllActiveSessions(): Promise<Session[]>;
+  cleanupExpiredSessions(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -101,7 +102,7 @@ export class DatabaseStorage implements IStorage {
   async createSession(courtId: string, userId: string, userEmail: string): Promise<Session> {
     const id = randomUUID();
     const startTime = Date.now();
-    const endTime = startTime + 3600000; // 1 hour (3600000 ms)
+    const endTime = startTime + 3600000; // 1 hour (3600000 ms) = 60 minutes
     
     const session: Session = {
       id,
@@ -114,6 +115,20 @@ export class DatabaseStorage implements IStorage {
     
     this.sessions.set(id, session);
     return session;
+  }
+
+  // Clean up expired sessions
+  async cleanupExpiredSessions(): Promise<void> {
+    const now = Date.now();
+    const expiredIds: string[] = [];
+    
+    for (const [id, session] of this.sessions.entries()) {
+      if (now > session.endTime) {
+        expiredIds.push(id);
+      }
+    }
+    
+    expiredIds.forEach(id => this.sessions.delete(id));
   }
 
   async getSession(sessionId: string): Promise<Session | undefined> {
