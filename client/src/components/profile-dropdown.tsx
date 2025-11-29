@@ -39,8 +39,13 @@ export function ProfileDropdown() {
   });
 
   const handleLogout = async () => {
-    await fetch("/api/logout");
-    window.location.href = "/";
+    try {
+      // Navigate directly to logout endpoint which handles redirect
+      window.location.href = "/api/logout";
+    } catch (error) {
+      console.error("Logout error:", error);
+      window.location.href = "/";
+    }
   };
 
   const handleThemeChange = (newTheme: string) => {

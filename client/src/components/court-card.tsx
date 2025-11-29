@@ -86,11 +86,11 @@ export function CourtCard({ court, ws, userActiveSession }: CourtCardProps) {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    // Show minutes format for clarity
-    if (secs === 0) {
-      return `${mins} MIN`;
+    // Show MM:SS format - MM MIN only when showing exactly 60 minutes at start
+    if (mins === 60 && secs === 0) {
+      return "60 MIN";
     }
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const isAvailable = court.status === "available";
